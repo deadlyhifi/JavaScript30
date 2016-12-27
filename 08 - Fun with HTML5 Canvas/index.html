@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+    const canvas = document.querySelector('#draw');
+    const ctx = canvas.getContext('2d');
+    canvas.width = document.body.clientWidth;
+    canvas.height = document.body.clientHeight;
+    ctx.strokeStyle = '#BADA55';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 5;
+    ctx.globalCompositeOperation = 'difference';
+
+    let isDrawing = false;
+    let hue = 0;
+    let direction = true;
+
+    function draw(e) {
+        // stop drawing if mouse button is not down i.e left canvas, unclicked, and came back.
+        if (!isDrawing || event.buttons === 0) {
+            return;
+        }
+        ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.beginPath();
+        // start from… get current mouse position
+        ctx.moveTo(e.pageX, e.pageY);
+        // go to…
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+
+        // change hue
+        hue++;
+        if (hue >= 360) {
+            hue = 0;
+        }
+
+        // change line width
+        if (ctx.lineWidth >= 75 || ctx.lineWidth <= 4) {
+            direction = !direction;
+        }
+        if (direction) {
+            ctx.lineWidth++;
+        } else {
+            ctx.lineWidth--;
+        }
+    };
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', draw);
+</script>
+
+<style>
+    html, body {
+        margin:0;
+    }
+</style>
+
+</body>
+</html>
