@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mouse Shadow</title>
+    <style>
+    html {
+        color: black;
+        font-family: sans-serif;
+    }
+
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: black;
+    }
+
+    h1 {
+        font-size: 100px;
+        text-shadow: 1px 1px 0 rgba(0,0,0,.5);
+    }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1 contenteditable>🔥 deadlyhifi</h1>
+    </div>
+
+    <script>
+        function debounce(func, wait = 20, immediate = true) {
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                var callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
+
+        const hero = document.querySelector('.hero');
+        const text = hero.querySelector('h1');
+        const walk = 15;
+
+        function shadow(e) {
+            const { offsetWidth: width, offsetHeight: height } = hero;
+            let { offsetX: x, offsetY: y } = e;
+
+            // fix x y issues relating to nested div
+            if (this !== e.target) {
+                x = x + e.target.offsetWidth;
+                y = y + e.target.offsetHeight;
+            }
+
+            const xWalk = Math.round((x / width * walk) - (walk / 2));
+            const yWalk = Math.round((y / height * walk) - (walk / 2));
+
+            setShadow(xWalk, yWalk);
+        }
+
+        function setShadow(x, y) {
+            text.style.textShadow = `
+                ${x}px ${y}px 0 rgba(255, 0, 255, .7),
+                ${x * -1}px ${y}px 0 rgba(0, 255, 255, .7),
+                ${y}px ${x * -1}px 0 rgba(0, 33, 255, .7),
+                ${y * -1}px ${x}px 0 rgba(66, 33, 66, .7)
+            `;
+        }
+
+        setShadow(5, 5); // initial
+        hero.addEventListener('mousemove', debounce(shadow));
+    </script>
+</body>
+</html>
