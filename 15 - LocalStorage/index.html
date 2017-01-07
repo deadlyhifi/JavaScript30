@@ -19,12 +19,28 @@
         <input type="text" name="item" placeholder="Item Name" required>
         <input type="submit" value="+ Add Item">
     </form>
+    <button class="checkAll">Set All Done</button>
+    <button class="uncheckAll">Set All Undone</button>
+    <button class="deleteAll">Delete All Tasks</button>
 </div>
 
 <script>
     const addItems = document.querySelector('.add-items');
     const itemsList = document.querySelector('.plates');
+    const checkAll = document.querySelector('.checkAll');
+    const uncheckAll = document.querySelector('.uncheckAll');
+    const delAll = document.querySelector('.deleteAll');
+
     const items = JSON.parse(localStorage.getItem('items')) || [];
+
+    function populateList(items = [], itemsList) {
+        itemsList.innerHTML = items.map((item, i) => {
+            return `<li>
+                <input type="checkbox" data-index=${i} id="item${i}"${item.done ? ' checked' : ''} />
+                <label for="item${i}">${item.text}</label>
+            </li>`;
+        }).join('');
+    }
 
     function addItem(e) {
         e.preventDefault();
@@ -35,26 +51,13 @@
             done: false
         }
         items.push(item);
-        // appendToList(item, itemsList);
-        localStorage.setItem('items', JSON.stringify(items));
-        populateList(items, itemsList);
+        updateList();
         this.reset();
-
-        // console.clear();
-        // console.table(items);
     }
 
-    // function appendToList(dish, dishList) {
-    //     dishList.insertAdjacentHTML('beforeend', `<li>${dish.text}</li>`);
-    // }
-
-    function populateList(items = [], itemsList) {
-        itemsList.innerHTML = items.map((item, i) => {
-            return `<li>
-                <input type="checkbox" data-index=${i} id="item${i}"${item.done ? ' checked' : ''} />
-                <label for="item${i}">${item.text}</label>
-            </li>`;
-        }).join('');
+    function updateList() {
+        localStorage.setItem('items', JSON.stringify(items));
+        populateList(items, itemsList);
     }
 
     function toggleDone(e) {
@@ -66,14 +69,28 @@
         const el = e.target;
         const index = el.dataset.index;
         items[index].done = !items[index].done;
-        localStorage.setItem('items', JSON.stringify(items));
-        populateList(items, itemsList);
+        updateList();
+    }
+
+    function toggleAll(setStatus) {
+        Object.keys(items).forEach(key => {
+            items[key].done = setStatus;
+        });
+        updateList();
+    }
+
+    function deleteAll() {
+        items.length = 0;
+        updateList();
     }
 
     populateList(items, itemsList);
     addItems.addEventListener('submit', addItem);
     // event delegation - responsible parent! Pass the click down the line
     itemsList.addEventListener('click', toggleDone);
+    checkAll.addEventListener('click', () => toggleAll(true));
+    uncheckAll.addEventListener('click', () => toggleAll(false));
+    delAll.addEventListener('click', deleteAll);
 </script>
 </body>
 </html>
