@@ -189,26 +189,13 @@
     videos.forEach(video => video.insertAdjacentHTML('beforeend', ' – <time>' + video.dataset.time + '</time>'));
 
     // calculate total time
-    const totalTime = convertSecondsToHHMMSS(videos.reduce((total, video) => total + convertToSeconds(video.dataset.time), 0));
+    const totalSeconds = videos.reduce((total, node) => {
+        const [min, sec] = node.dataset.time.split(':').map(parseFloat);
+        return total + ((min * 60) + sec);
+    }, 0);
 
     // append ul with total time
-    document.querySelector('.videos').insertAdjacentHTML('afterend', '<div><b>Total Time:</b> ' + totalTime + '</div>');
-
-    function convertToSeconds(time) {
-        const minSec = time.split(':');
-        const min = +minSec[0];
-        const sec = +minSec[1];
-        let total = 0;
-
-        if (min > 0) {
-            total += min * 60;
-        }
-        if (sec > 0) {
-            total += sec;
-        }
-
-        return total;
-    }
+    document.querySelector('.videos').insertAdjacentHTML('afterend', '<div><b>Total Time:</b> ' + convertSecondsToHHMMSS(totalSeconds) + '</div>');
 
     function convertSecondsToHHMMSS(timeInSeconds) {
         const hours = Math.floor(timeInSeconds / 3600);
