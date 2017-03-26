@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Speech Synthesis</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="voiceinator">
+
+    <h1>The Voiceinator 5000</h1>
+
+    <select name="voice" id="voices">
+      <option value="">Select A Voice</option>
+    </select>
+
+    <label for="rate">Rate:</label>
+    <input name="rate" type="range" min="0" max="3" value="1" step="0.1">
+
+    <label for="pitch">Pitch:</label>
+
+    <input name="pitch" type="range" min="0" max="2" step="0.1">
+    <textarea name="text">They're in your room while you're sleeping. They're in your car behind the seat waiting. All the rifle sights are on the
+back of your head. They're slipping it into your drink when you're not looking. And they're selling it to you as art. It's
+every other word in movies and songs. All the public is buying, it's business as usual, and the business is capitalising
+on your fear, your greed, your perversions and vices. They say you're guilty, they've got the evidence to prove it. The mistakes
+are obvious, the faults are glaring. The plane is on fire, the fucking ship is sinking. And you're swept away in a hurricane.
+You're buried in the rubble of an earthquake. It's terminal, inoperable, they're amputating! Massive hemorrhaging, major
+fucking complications! (© Against Me! - Miami)</textarea>
+    <button id="speak">Speak</button>
+    <button id="stop">Stop!</button>
+  </div>
+
+<script>
+  const msg = new SpeechSynthesisUtterance();
+  let voices = [];
+  const voicesDropdown = document.querySelector('[name="voice"]');
+  const options = document.querySelectorAll('[type="range"], [name="text"]');
+  const speakButton = document.querySelector('#speak');
+  const stopButton = document.querySelector('#stop');
+
+  msg.text = document.querySelector('[name="text"]').value;
+
+  function populateVoices() {
+    voices = this.getVoices();
+    voicesDropdown.innerHTML = voices
+      .filter(voice => voice.lang.includes('en'))
+      .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
+      .join('');
+  }
+
+  function setVoice() {
+    msg.voice = voices.find(voice => voice.name === this.value);
+    toggle();
+  }
+
+  function toggle(restart = true) {
+    speechSynthesis.cancel();
+    if (restart) {
+      speechSynthesis.speak(msg);
+    }
+  }
+
+  function setOption() {
+    console.log(this.name, this.value);
+    msg[this.name] = this.value;
+    toggle();
+  }
+
+  speechSynthesis.addEventListener('voiceschanged', populateVoices);
+  voicesDropdown.addEventListener('change', setVoice);
+  options.forEach(option => option.addEventListener('change', setOption));
+  speakButton.addEventListener('click', toggle);
+  stopButton.addEventListener('click', () => toggle(false));
+</script>
+
+</body>
+</html>
