@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whack A Mole!</title>
+  <link href='https://fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Whack-a-mole! <span class="score">0</span></h1>
+  <button class="start-game">Start!</button>
+
+  <div class="game">
+    <div class="hole hole1">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole2">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole3">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole4">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole5">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole6">
+      <div class="mole"></div>
+    </div>
+  </div>
+
+<script>
+  const startButton = document.querySelector('.start-game');
+  const scoreBoard = document.querySelector('.score');
+  const holes = document.querySelectorAll('.hole');
+  const moles = document.querySelectorAll('.mole');
+  let lastHole;
+  let timeIsUp = false;
+  let score = 0;
+
+  function randomTime(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
+
+  function randomHole(holes) {
+    const idx = Math.floor(Math.random() * holes.length);
+    const hole = holes[idx];
+
+    if (hole === lastHole) {
+      return randomHole(holes);
+    }
+
+    lastHole = hole;
+    return hole;
+  }
+
+  function peepMole() {
+    const time = randomTime(200, 1000);
+    const hole = randomHole(holes);
+
+    hole.classList.add('up');
+
+    setTimeout(() => {
+      hole.classList.remove('up');
+      if (!timeIsUp) {
+        peepMole();
+      }
+    }, time);
+  }
+
+  function bonkDeConk(e) {
+    console.log('Bonk!');
+
+    if (!e.isTrusted) {
+      console.log('No cheating!');
+      return;
+    }
+
+    this.classList.remove('up');
+    score++;
+    scoreBoard.textContent = score;
+  }
+
+  function startGame() {
+    console.log('Game Starting');
+    score = 0;
+    scoreBoard.textContent = 0;
+    timeIsUp = false;
+    peepMole()
+
+    setTimeout(() => {
+      timeIsUp = true;
+      console.log('Game ending');
+    }, 10000);
+  }
+
+  startButton.addEventListener('click', startGame);
+  moles.forEach(mole => mole.addEventListener('click', bonkDeConk));
+</script>
+</body>
+</html>
